@@ -5,12 +5,17 @@
   "scripts": {
     "dev": "next dev -p 3100",
     "build": "next build",
-    "start": "next start -p 3100"
+    "start": "next start -p 3100",
+    "test": "vitest run"
   },
   "dependencies": {
+    "mongoose": "^9.9.2",
     "next": "^16.3.0",
     "react": "^19.2.8",
-    "react-dom": "^19.2.8",
-    "mongoose": "^9.9.2"
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "mongodb-memory-server": "^11.2.0",
+    "vitest": "^4.1.10"
   }
 }
