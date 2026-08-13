@@ -5,6 +5,10 @@ import NewEmailForm from '@/components/NewEmailForm';
 
 export const dynamic = 'force-dynamic';
 
+function formatIST(date) {
+  return new Date(date).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+}
+
 export default async function DashboardPage() {
   await connectDB();
   const emails = await getEmailsWithStats();
@@ -28,15 +32,15 @@ export default async function DashboardPage() {
               <span>{email.label || '(no label)'}</span>
               <span>
                 {email.openCount} opens
-                {email.lastOpenedAt ? ` · last ${new Date(email.lastOpenedAt).toLocaleString()}` : ''}
+                {email.lastOpenedAt ? ` · last ${formatIST(email.lastOpenedAt)}` : ''}
               </span>
             </summary>
             <div style={{ marginTop: '0.5rem', fontSize: '0.9rem', color: '#555' }}>
-              <p>Created {new Date(email.createdAt).toLocaleString()}</p>
+              <p>Created {formatIST(email.createdAt)}</p>
               {email.opens.length > 0 ? (
                 <ul>
                   {email.opens.map((t, i) => (
-                    <li key={i}>{new Date(t).toLocaleString()}</li>
+                    <li key={i}>{formatIST(t)}</li>
                   ))}
                 </ul>
               ) : (
