@@ -14,7 +14,7 @@ afterAll(async () => {
   await mongod.stop();
 });
 
-describe('getEmailsWithStats', () => {
+describe('getEmailsWithStats — opens', () => {
   it('returns emails newest-first with open count and last-opened timestamp', async () => {
     const { TrackedEmail } = await import('../lib/models/TrackedEmail.js');
     const { OpenEvent } = await import('../lib/models/OpenEvent.js');
@@ -104,5 +104,65 @@ describe('getEmailsWithStats', () => {
     const stats = await getEmailsWithStats();
     const found = stats.find((e) => e.id === email._id.toString());
     expect(found.opens[0].classification).toBe('recipient');
+  });
+});
+
+describe('getEmailsWithStats — clicks', () => {
+  it('returns click count, last-clicked timestamp, and per-click ip/userAgent/destination', async () => {
+    const { TrackedEmail } = await import('../lib/models/TrackedEmail.js');
+    const { ClickEvent } = await import('../lib/models/ClickEvent.js');
+    const { getEmailsWithStats } = await import('../lib/emailStats.js');
+
+    const email = await TrackedEmail.create({ label: 'Click test', createdAt: new Date('2026-05-01T00:00:00Z') });
+    await ClickEvent.create({
+      trackedEmailId: email._id,
+      clickedAt: new Date('2026-05-02T09:00:00Z'),
+      ip: '2.2.2.2',
+      userAgent: 'UA2',
+      destination: 'https://example.com',
+    });
+
+    const stats = await getEmailsWithStats();
+    const found = stats.find((e) => e.id === email._id.toString());
+    expect(found.clickCount).toBe(1);
+    expect(found.lastClickedAt.toISOString()).toBe('2026-05-02T09:00:00.000Z');
+    expect(found.clicks[0].ip).toBe('2.2.2.2');
+    expect(found.clicks[0].userAgent).toBe('UA2');
+    expect(found.clicks[0].destination).toBe('https://example.com');
+    expect(found.clicks[0].classification).toBe('recipient');
+  });
+
+  it('classifies a click within 5 minutes of creation as automated, independently of opens', async () => {
+    const { TrackedEmail } = await import('../lib/models/TrackedEmail.js');
+    const { ClickEvent } = await import('../lib/models/ClickEvent.js');
+    const { getEmailsWithStats } = await import('../lib/emailStats.js');
+
+    const createdAt = new Date('2026-06-01T00:00:00Z');
+    const email = await TrackedEmail.create({ label: 'Click auto test', createdAt });
+    await ClickEvent.create({ trackedEmailId: email._id, clickedAt: new Date(createdAt.getTime() + 60000), destination: 'https://x.com' });
+
+    const stats = await getEmailsWithStats();
+    const found = stats.find((e) => e.id === email._id.toString());
+    expect(found.clicks[0].classification).toBe('automated');
+  });
+
+  it('classifies a click inside an active test session as self-test', async () => {
+    const { TrackedEmail } = await import('../lib/models/TrackedEmail.js');
+    const { ClickEvent } = await import('../lib/models/ClickEvent.js');
+    const { TestSession } = await import('../lib/models/TestSession.js');
+    const { getEmailsWithStats } = await import('../lib/emailStats.js');
+
+    const createdAt = new Date('2026-06-02T00:00:00Z');
+    const email = await TrackedEmail.create({ label: 'Click self test', createdAt });
+    const clickedAt = new Date('2026-06-05T00:00:00Z');
+    await ClickEvent.create({ trackedEmailId: email._id, clickedAt, destination: 'https://x.com' });
+    await TestSession.create({
+      startedAt: new Date(clickedAt.getTime() - 10000),
+      expiresAt: new Date(clickedAt.getTime() + 10000),
+    });
+
+    const stats = await getEmailsWithStats();
+    const found = stats.find((e) => e.id === email._id.toString());
+    expect(found.clicks[0].classification).toBe('self-test');
   });
 });

@@ -41,14 +41,16 @@ export default async function DashboardPage() {
               <span>{email.label || '(no label)'}</span>
               <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <span>
-                  {email.openCount} opens
-                  {email.lastOpenedAt ? ` · last ${formatIST(email.lastOpenedAt)}` : ''}
+                  {email.openCount} opens · {email.clickCount} clicks
+                  {email.lastOpenedAt ? ` · last open ${formatIST(email.lastOpenedAt)}` : ''}
                 </span>
                 <DeleteEmailButton id={email.id} />
               </span>
             </summary>
             <div style={{ marginTop: '0.5rem', fontSize: '0.9rem', color: '#555' }}>
               <p>Created {formatIST(email.createdAt)}</p>
+
+              <p style={{ fontWeight: 700, marginTop: '0.75rem' }}>Opens (pixel)</p>
               {email.opens.length > 0 ? (
                 <ul style={{ paddingLeft: '1.2rem' }}>
                   {email.opens.map((o, i) => {
@@ -69,6 +71,29 @@ export default async function DashboardPage() {
                 </ul>
               ) : (
                 <p>Not opened yet.</p>
+              )}
+
+              <p style={{ fontWeight: 700, marginTop: '0.75rem' }}>Clicks (link/button)</p>
+              {email.clicks.length > 0 ? (
+                <ul style={{ paddingLeft: '1.2rem' }}>
+                  {email.clicks.map((c, i) => {
+                    const label = CLASSIFICATION_LABEL[c.classification];
+                    return (
+                      <li key={i} style={{ marginBottom: '0.4rem' }}>
+                        <div>
+                          {formatIST(c.clickedAt)}
+                          {' — '}
+                          <span style={{ color: label.color }}>{label.text}</span>
+                        </div>
+                        <div style={{ fontSize: '0.75rem', color: '#999' }}>
+                          {c.ip || 'unknown ip'} · {c.userAgent || 'unknown device'} → {c.destination}
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              ) : (
+                <p>No clicks yet.</p>
               )}
             </div>
           </details>
