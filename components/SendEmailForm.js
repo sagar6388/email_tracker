@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { buildTrackedEmailHtml } from '@/lib/emailTemplate';
 
 const initialState = {
   to: '',
@@ -16,9 +17,23 @@ export default function SendEmailForm() {
   const [form, setForm] = useState(initialState);
   const [status, setStatus] = useState(null);
   const [sending, setSending] = useState(false);
+  const [previewHtml, setPreviewHtml] = useState(null);
 
   function update(field) {
     return (e) => setForm((f) => ({ ...f, [field]: e.target.value }));
+  }
+
+  function handlePreview(e) {
+    e.preventDefault();
+    setPreviewHtml(
+      buildTrackedEmailHtml({
+        eyebrow: form.eyebrow || 'a small thing, for you',
+        message: form.message || "I made something. It's small, and it's yours.",
+        buttonText: form.buttonText || 'Open It →',
+        buttonUrl: form.buttonUrl || '#',
+        pixelUrl: '',
+      })
+    );
   }
 
   async function handleSubmit(e) {
@@ -56,9 +71,22 @@ export default function SendEmailForm() {
         <textarea placeholder="Message" value={form.message} onChange={update('message')} rows={2} style={{ padding: '0.5rem' }} />
         <input type="text" placeholder="Button text" value={form.buttonText} onChange={update('buttonText')} style={{ padding: '0.5rem' }} />
         <input type="url" placeholder="Button destination URL" value={form.buttonUrl} onChange={update('buttonUrl')} required style={{ padding: '0.5rem' }} />
-        <button type="submit" disabled={sending}>{sending ? 'Sending…' : 'Send'}</button>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <button type="button" onClick={handlePreview}>Preview</button>
+          <button type="submit" disabled={sending}>{sending ? 'Sending…' : 'Send'}</button>
+        </div>
       </form>
       {status && <p style={{ color: status.ok ? '#2a8' : 'crimson', marginTop: '0.5rem' }}>{status.text}</p>}
+      {previewHtml && (
+        <div style={{ marginTop: '1rem' }}>
+          <p style={{ fontSize: '0.85rem', color: '#888', marginBottom: '0.4rem' }}>Preview (pixel/tracking won't fire from this):</p>
+          <iframe
+            title="Email preview"
+            srcDoc={previewHtml}
+            style={{ width: '100%', height: '360px', border: '1px solid #eee', borderRadius: 6, background: '#fff' }}
+          />
+        </div>
+      )}
     </details>
   );
 }
