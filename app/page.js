@@ -2,6 +2,7 @@ import { headers } from 'next/headers';
 import { connectDB } from '@/lib/db';
 import { getEmailsWithStats } from '@/lib/emailStats';
 import NewEmailForm from '@/components/NewEmailForm';
+import SendEmailForm from '@/components/SendEmailForm';
 import TestModeButton from '@/components/TestModeButton';
 import DeleteEmailButton from '@/components/DeleteEmailButton';
 
@@ -30,6 +31,7 @@ export default async function DashboardPage() {
     <main style={{ maxWidth: 720, margin: '2rem auto', padding: '0 1rem', fontFamily: 'system-ui, sans-serif' }}>
       <h1>Email Tracker</h1>
       <TestModeButton />
+      <SendEmailForm />
       <NewEmailForm origin={origin} />
       <div>
         {emails.map((email) => (
