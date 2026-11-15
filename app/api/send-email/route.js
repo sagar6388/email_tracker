@@ -6,7 +6,35 @@ import { sendMail } from '@/lib/mailer';
 
 export async function POST(req) {
   const body = await req.json().catch(() => ({}));
-  const { to, subject, label, eyebrow, message, buttonText, buttonUrl } = body;
+  const {
+    to,
+    subject,
+    label,
+    theme,
+    senderName,
+    useDirectLink,
+    // Classic fields
+    eyebrow,
+    message,
+    // AstroVeda fields
+    recipientName,
+    headerBadge,
+    headerTitle,
+    introText,
+    awardTitle,
+    awardSubtitle,
+    benefit1Title,
+    benefit1Desc,
+    benefit2Title,
+    benefit2Desc,
+    benefit3Title,
+    benefit3Desc,
+    footerTitle,
+    footerSubtitle,
+    // CTA Button
+    buttonText,
+    buttonUrl,
+  } = body;
 
   if (!to || !buttonUrl) {
     return Response.json({ error: 'to and buttonUrl are required' }, { status: 400 });
@@ -24,18 +52,45 @@ export async function POST(req) {
   const origin = `${protocol}://${host}`;
 
   const pixelUrl = `${origin}/api/track/open/${id}`;
-  const clickUrl = `${origin}/api/track/click/${id}?to=${encodeURIComponent(buttonUrl)}`;
+  // If useDirectLink is enabled (default on localhost to avoid spam filters), bypass localhost redirect
+  const clickUrl = useDirectLink
+    ? buttonUrl
+    : `${origin}/api/track/click/${id}?to=${encodeURIComponent(buttonUrl)}`;
 
   const html = buildTrackedEmailHtml({
+    theme,
     eyebrow: eyebrow || 'a small thing, for you',
     message: message || "I made something. It's small, and it's yours.",
-    buttonText: buttonText || 'Open It →',
+    recipientName,
+    headerBadge,
+    headerTitle,
+    introText,
+    awardTitle,
+    awardSubtitle,
+    benefit1Title,
+    benefit1Desc,
+    benefit2Title,
+    benefit2Desc,
+    benefit3Title,
+    benefit3Desc,
+    footerTitle,
+    footerSubtitle,
+    buttonText: buttonText || (theme === 'astroveda' ? 'Claim Your Consultation Pass on Telegram ➔' : 'Open It →'),
     buttonUrl: clickUrl,
     pixelUrl,
   });
 
+  const defaultSubject = theme === 'astroveda'
+    ? 'AstroVeda Vedic Guidance & Consultation Pass for Reena'
+    : 'A small thing, for you';
+
   try {
-    await sendMail({ to, subject: subject || 'A small thing, for you', html });
+    await sendMail({
+      to,
+      subject: subject || defaultSubject,
+      html,
+      senderName,
+    });
   } catch (err) {
     return Response.json({ id, sent: false, error: 'Failed to send email' }, { status: 502 });
   }
