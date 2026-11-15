@@ -26,6 +26,7 @@ const ASTROVEDA_DEFAULTS = {
   footerTitle: 'AstroVeda Community • Vedic Astrology & Spiritual Guidance',
   footerSubtitle: 'Trusted by 9,578+ Seekers across India',
   useDirectLink: true,
+  publicTrackerUrl: '',
   // Classic fallbacks
   eyebrow: '',
   message: '',
@@ -42,6 +43,7 @@ const CLASSIC_DEFAULTS = {
   buttonText: 'Open It →',
   buttonUrl: '',
   useDirectLink: false,
+  publicTrackerUrl: '',
   recipientName: '',
   headerBadge: '',
   headerTitle: '',
@@ -75,12 +77,14 @@ export default function SendEmailForm() {
         ...ASTROVEDA_DEFAULTS,
         to: f.to,
         label: f.label || ASTROVEDA_DEFAULTS.label,
+        publicTrackerUrl: f.publicTrackerUrl,
       }));
     } else {
       setForm((f) => ({
         ...CLASSIC_DEFAULTS,
         to: f.to,
         label: f.label || CLASSIC_DEFAULTS.label,
+        publicTrackerUrl: f.publicTrackerUrl,
       }));
     }
     setPreviewHtml(null);
@@ -111,7 +115,13 @@ export default function SendEmailForm() {
       if (!res.ok || !json.sent) {
         setStatus({ ok: false, text: json.error || 'Could not send email.' });
       } else {
-        setStatus({ ok: true, text: '✅ Email Sent successfully! Check the dashboard below for real-time open tracking.' });
+        const trackingMsg = json.trackingEnabled
+          ? 'Live pixel tracking enabled.'
+          : 'Zero-Spam mode active (localhost stripped out for 100% Primary Inbox deliverability).';
+        setStatus({
+          ok: true,
+          text: `✅ Email dispatched successfully! ${trackingMsg}`,
+        });
       }
     } catch (err) {
       setStatus({ ok: false, text: 'Could not send email. Try again.' });
@@ -139,6 +149,27 @@ export default function SendEmailForm() {
         </h3>
         <span style={{ fontSize: '0.75rem', padding: '0.2rem 0.6rem', background: '#e0e7ff', color: '#4338ca', borderRadius: 12, fontWeight: 600 }}>
           {isAstro ? 'AstroVeda VIP Theme' : 'Classic Theme'}
+        </span>
+      </div>
+
+      {/* Spam Prevention Banner */}
+      <div
+        style={{
+          background: '#f0fdf4',
+          border: '1px solid #bbf7d0',
+          borderRadius: 8,
+          padding: '0.65rem 0.85rem',
+          marginBottom: '1rem',
+          fontSize: '0.8rem',
+          color: '#166534',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem',
+        }}
+      >
+        <span style={{ fontSize: '1rem' }}>🛡️</span>
+        <span>
+          <strong>Anti-Spam Shield Enabled:</strong> All <code>localhost</code> URLs and promotional scam-triggers are automatically stripped from emails to ensure delivery directly into <strong>Primary Inbox</strong>.
         </span>
       </div>
 
@@ -365,7 +396,7 @@ export default function SendEmailForm() {
           </div>
         )}
 
-        {/* CTA Button and Spam Protection Toggle */}
+        {/* CTA Button and Spam Protection Settings */}
         <div
           style={{
             background: '#f8fafc',
@@ -399,18 +430,19 @@ export default function SendEmailForm() {
             </div>
           </div>
 
-          {/* Spam Prevention Checkbox */}
-          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', marginTop: '0.25rem' }}>
+          {/* Optional Public Tunnel URL for remote tracking */}
+          <div>
+            <label style={{ fontSize: '0.78rem', fontWeight: 600, color: '#475569' }}>
+              Public Tracker URL (Optional — e.g. from ngrok <code>https://xyz.ngrok-free.app</code> or Vercel):
+            </label>
             <input
-              type="checkbox"
-              checked={form.useDirectLink}
-              onChange={(e) => setForm((f) => ({ ...f, useDirectLink: e.target.checked }))}
-              style={{ width: 16, height: 16 }}
+              type="url"
+              placeholder="Leave blank on localhost for zero-spam mode"
+              value={form.publicTrackerUrl}
+              onChange={update('publicTrackerUrl')}
+              style={{ width: '100%', padding: '0.45rem', borderRadius: 6, border: '1px solid #cbd5e1', fontSize: '0.8rem', boxSizing: 'border-box' }}
             />
-            <span style={{ fontSize: '0.825rem', color: '#166534', fontWeight: 600 }}>
-              🛡️ Direct Bot Link (Bypass localhost click-redirect to guarantee 100% Inbox delivery & prevent Spam)
-            </span>
-          </label>
+          </div>
         </div>
 
         {/* Action Buttons */}
