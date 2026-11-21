@@ -1,11 +1,11 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { buildTrackedEmailHtml } from '@/lib/emailTemplate';
 
 const ASTROVEDA_DEFAULTS = {
   theme: 'astroveda',
-  to: '',
+  to: 'acharyasarveshtiwari@gmail.com',
   senderName: 'Acharya Sarvesh Tiwari',
   subject: 'AstroVeda is back after 4 years',
   label: 'AstroVeda Feedback',
@@ -34,13 +34,13 @@ const ASTROVEDA_DEFAULTS = {
 
 const CLASSIC_DEFAULTS = {
   theme: 'classic',
-  to: '',
+  to: 'acharyasarveshtiwari@gmail.com',
   senderName: '',
   subject: 'A small thing, for you',
   label: '',
   eyebrow: 'a small thing, for you',
   message: "I made something. It's small, and it's yours.",
-  buttonText: 'Open It →',
+  buttonText: 'Open It â†’',
   buttonUrl: '',
   useDirectLink: false,
   publicTrackerUrl: '',
@@ -120,7 +120,7 @@ export default function SendEmailForm() {
           : 'Zero-Spam mode active (localhost stripped out for 100% Primary Inbox deliverability).';
         setStatus({
           ok: true,
-          text: `✅ Email dispatched successfully! ${trackingMsg}`,
+          text: `âœ… Email dispatched successfully! ${trackingMsg}`,
         });
       }
     } catch (err) {
@@ -145,7 +145,7 @@ export default function SendEmailForm() {
     >
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
         <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: '#1e293b', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          ✉️ Compose & Send Tracked Email
+          âœ‰ï¸ Compose & Send Tracked Email
         </h3>
         <span style={{ fontSize: '0.75rem', padding: '0.2rem 0.6rem', background: '#e0e7ff', color: '#4338ca', borderRadius: 12, fontWeight: 600 }}>
           {isAstro ? 'AstroVeda VIP Theme' : 'Classic Theme'}
@@ -167,7 +167,7 @@ export default function SendEmailForm() {
           gap: '0.5rem',
         }}
       >
-        <span style={{ fontSize: '1rem' }}>🛡️</span>
+        <span style={{ fontSize: '1rem' }}>ðŸ›¡ï¸</span>
         <span>
           <strong>Anti-Spam Shield Enabled:</strong> All <code>localhost</code> URLs and promotional scam-triggers are automatically stripped from emails to ensure delivery directly into <strong>Primary Inbox</strong>.
         </span>
@@ -194,8 +194,8 @@ export default function SendEmailForm() {
                 color: '#1e293b',
               }}
             >
-              <option value="astroveda">🔮 AstroVeda VIP Cosmic Theme (Vedic Pass)</option>
-              <option value="classic">📜 Classic Minimalist Theme</option>
+              <option value="astroveda">ðŸ”® AstroVeda VIP Cosmic Theme (Vedic Pass)</option>
+              <option value="classic">ðŸ“œ Classic Minimalist Theme</option>
             </select>
           </div>
 
@@ -299,7 +299,7 @@ export default function SendEmailForm() {
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#6d28d9', fontWeight: 700, fontSize: '0.9rem' }}>
-              <span>🔮</span> AstroVeda VIP Content Customization
+              <span>ðŸ”®</span> AstroVeda VIP Content Customization
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.6rem' }}>
@@ -433,7 +433,7 @@ export default function SendEmailForm() {
           {/* Optional Public Tunnel URL for remote tracking */}
           <div>
             <label style={{ fontSize: '0.78rem', fontWeight: 600, color: '#475569' }}>
-              Public Tracker URL (Optional — e.g. from ngrok <code>https://xyz.ngrok-free.app</code> or Vercel):
+              Public Tracker URL (Optional â€” e.g. from ngrok <code>https://xyz.ngrok-free.app</code> or Vercel):
             </label>
             <input
               type="url"
@@ -461,7 +461,7 @@ export default function SendEmailForm() {
               cursor: 'pointer',
             }}
           >
-            👁️ Live Preview
+            ðŸ‘ï¸ Live Preview
           </button>
           <button
             type="submit"
@@ -478,7 +478,7 @@ export default function SendEmailForm() {
               boxShadow: '0 4px 12px rgba(37, 99, 235, 0.25)',
             }}
           >
-            {sending ? 'Sending…' : '🚀 Send Tracked Email'}
+            {sending ? 'Sendingâ€¦' : 'ðŸš€ Send Tracked Email'}
           </button>
         </div>
       </form>
